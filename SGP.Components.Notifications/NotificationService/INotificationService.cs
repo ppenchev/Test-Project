@@ -5,7 +5,7 @@ namespace NotificationService
     [ServiceContract]
     public interface INotificationService
     {
-        [OperationContract]
+        //[OperationContract]
 
     }
 }
