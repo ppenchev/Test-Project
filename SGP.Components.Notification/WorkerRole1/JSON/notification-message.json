@@ -1,6 +1,0 @@
-{
-	"UserId":"abc-123",
-	"NotificationType":"browser",
-	"BrowserMessageType":"top-right-panel-id",
-	"Payload": "Additional information here."
-}
