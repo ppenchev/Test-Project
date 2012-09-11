@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "SGP.Components.Notification", "SGP.Components.Notification.ccproj", "{D40854B5-023F-46B1-854D-B867EBDD27C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerRole1", "WorkerRole1\WorkerRole1.csproj", "{F664A01D-96D2-4A92-8C06-09477481C443}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D40854B5-023F-46B1-854D-B867EBDD27C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D40854B5-023F-46B1-854D-B867EBDD27C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D40854B5-023F-46B1-854D-B867EBDD27C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D40854B5-023F-46B1-854D-B867EBDD27C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F664A01D-96D2-4A92-8C06-09477481C443}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F664A01D-96D2-4A92-8C06-09477481C443}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F664A01D-96D2-4A92-8C06-09477481C443}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F664A01D-96D2-4A92-8C06-09477481C443}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
