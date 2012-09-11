@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.IO;
 using Microsoft.WindowsAzure.Diagnostics;
@@ -9,7 +8,7 @@ namespace NotificationService
     public class AzureLocalStorageTraceListener : XmlWriterTraceListener
     {
         public AzureLocalStorageTraceListener()
-            : base(Path.Combine(AzureLocalStorageTraceListener.GetLogDirectory().Path, "NotificationService.svclog"))
+            : base(Path.Combine(GetLogDirectory().Path, "NotificationService.svclog"))
         {
         }
 

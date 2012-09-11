@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
 
@@ -12,7 +9,7 @@ namespace NotificationService
         public override bool OnStart()
         {
             // To enable the AzureLocalStorageTraceListner, uncomment relevent section in the web.config  
-            DiagnosticMonitorConfiguration diagnosticConfig = DiagnosticMonitor.GetDefaultInitialConfiguration();
+            var diagnosticConfig = DiagnosticMonitor.GetDefaultInitialConfiguration();
             diagnosticConfig.Directories.ScheduledTransferPeriod = TimeSpan.FromMinutes(1);
             diagnosticConfig.Directories.DataSources.Add(AzureLocalStorageTraceListener.GetLogDirectory());
 
