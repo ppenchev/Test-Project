@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -44,23 +45,26 @@ namespace NotificationRole
             //Setting up service bus 
             var credentials = TokenProvider.CreateSharedSecretTokenProvider(issuerName, issuerKey);
 
+            var settings = new MessagingFactorySettings {OperationTimeout = new TimeSpan(0, 0, 1), TokenProvider = credentials};
+
             var factory =
-                MessagingFactory.Create(ServiceBusEnvironment.CreateServiceUri("bede", serviceNamespace, string.Empty),
-                                        credentials);
-
-            //Input queue client is created
+                MessagingFactory.Create(ServiceBusEnvironment.CreateServiceUri("sb", serviceNamespace, string.Empty),
+                                        settings);
+            
+            //Input queue client and error queue client creation
             var inputQueueClient = factory.CreateQueueClient(inputQueue);
-
-            //Get sample json message
-            using (var textReader = new StreamReader(File.Open(@".\Json\notification-message.txt",
-                                                               FileMode.Open)))
-            {
-                message.Properties.Add("message-" + Guid.NewGuid(), textReader.ReadToEnd());
-                inputQueueClient.Send(message);
-            }
+            var errorQueueClient = factory.CreateQueueClient(errorQueue);
 
             try
             {
+                //Get sample json message
+                using (var textReader = new StreamReader(File.Open(@".\Json\notification-message.txt", FileMode.Open)))
+                {
+                    message.Properties.Add("message-" + Guid.NewGuid(), textReader.ReadToEnd());
+                    inputQueueClient.Send(message);
+                }
+
+
                 //Read messages
                 while ((message = inputQueueClient.Receive(new TimeSpan(0, 0, 5))) != null)
                 {
@@ -77,17 +81,21 @@ namespace NotificationRole
             catch (Exception ex)
             {
                 //Handle failure and send message to error queue
-                
-                var errorQueueClient = factory.CreateQueueClient(errorQueue);
-                var errorBrokerMessage = new BrokeredMessage(ex);
+                var errorBrokerMessage = new BrokeredMessage();
+                errorBrokerMessage.Properties.Add(ex.GetType().ToString(), ex.Message);
                 errorQueueClient.Send(errorBrokerMessage);
 
                 //Acknowledge the message
                 if (message != null) message.Abandon();
-            }
 
-            factory.Close();
-            inputQueueClient.Close();
+            }
+            finally
+            {
+                factory.Close();
+                inputQueueClient.Close();
+                errorQueueClient.Close();
+            }
+          
         }
 
     }
