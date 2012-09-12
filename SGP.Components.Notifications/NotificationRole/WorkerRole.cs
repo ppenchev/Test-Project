@@ -108,6 +108,7 @@ namespace NotificationRole
             {
                   //Mock sending notification to queue. Get sample json file representing notification message
                 var message = new BrokeredMessage(fileStrem, true);
+                //This line will be included when we have clearance on what descriptors should a message has.
                 //message.Properties.Add("message-" + Guid.NewGuid(), textReader.ReadToEnd());
                 _inputQueueClient.Send(message);
             }
