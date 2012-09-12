@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -8,16 +7,81 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure;
+using NotificationRole.Model;
 
 namespace NotificationRole
 {
     public class WorkerRole : RoleEntryPoint
     {
+        //Congiguration value fields
+        private string _issuerName;
+        private string _issuerKey;
+        private string _serviceNamespace;
+        private string _inputQueue;
+        private string _errorQueue;
+
+        private MessagingFactory _factory;
+
+        //Objects for comunicating with the queues
+        private QueueClient _inputQueueClient;
+        private QueueClient _errorQueueClient;
+
+        public WorkerRole()
+        {
+            //Configuration values retrieving
+            _issuerName = CloudConfigurationManager.GetSetting("Issuer");
+            _issuerKey = CloudConfigurationManager.GetSetting("Key");
+            _serviceNamespace = CloudConfigurationManager.GetSetting("ServiceBusNamespace");
+            _inputQueue = CloudConfigurationManager.GetSetting("InputQueueIdentifier");
+            _errorQueue = CloudConfigurationManager.GetSetting("ErrorQueueIdentifier");
+        }
+
         public override void Run()
         {
             Trace.WriteLine("NotificationRole entry point called", "Information");
             
-            SimulateNotification();
+            //Read messages
+            while (true)
+            {
+                //For experimental purposes we send message and right after that read it from the queue.
+                MockSend();
+
+                try
+                {
+                    var inputMessage = _inputQueueClient.Receive();
+
+                    Trace.WriteLine(string.Format("Message received: {0}, {1}", inputMessage.SequenceNumber, inputMessage.MessageId));
+                    inputMessage.Complete();
+
+                    //Perform request to third-party notification service. Skeleton implementation
+                    IPushMessageNotification notifier = new DummyMessageNotification();
+                    notifier.Send(new Message
+                                      {
+                                          BrowserMessageType = "top-right-panel-id",
+                                          NotificationType = "browser",
+                                          Payload = "Additional information here.",
+                                          UserId = "abc-123"
+                                      });
+                }
+                catch (Exception ex)
+                {
+                    //Handle failure and send message to error queue
+                    var errorBrokerMessage = new BrokeredMessage();
+                    errorBrokerMessage.Properties.Add(ex.GetType().ToString(), ex.Message);
+                    _errorQueueClient.Send(errorBrokerMessage);
+                }
+                
+                Thread.Sleep(10000);
+            }
+        }
+
+        public override void OnStop()
+        {
+            base.OnStop();
+
+            _factory.Close();
+            _inputQueueClient.Close();
+            _errorQueueClient.Close();
         }
 
         public override bool OnStart()
@@ -25,78 +89,42 @@ namespace NotificationRole
             // Set the maximum number of concurrent connections 
             ServicePointManager.DefaultConnectionLimit = 12;
 
-            // For information on handling configuration changes
-            // see the MSDN topic at http://go.microsoft.com/fwlink/?LinkId=166357.
+            //Setting up service bus 
+            var credentials = TokenProvider.CreateSharedSecretTokenProvider(_issuerName, _issuerKey);
 
+            _factory = 
+                MessagingFactory.Create(ServiceBusEnvironment.CreateServiceUri("sb", _serviceNamespace, string.Empty), credentials);
+
+            //Input queue client and error queue client creation
+            _inputQueueClient = _factory.CreateQueueClient(_inputQueue);
+            _errorQueueClient = _factory.CreateQueueClient(_errorQueue);            
+            
             return base.OnStart();
         }
 
-        static void SimulateNotification()
+        void MockSend()
         {
-
-            //Configuration values retriving
-            string issuerName = CloudConfigurationManager.GetSetting("Issuer"),
-                   issuerKey = CloudConfigurationManager.GetSetting("Key"),
-                   serviceNamespace = CloudConfigurationManager.GetSetting("ServiceBusNamespace"),
-                   inputQueue = CloudConfigurationManager.GetSetting("InputQueueIdentifier"),
-                   errorQueue = CloudConfigurationManager.GetSetting("ErrorQueueIdentifier");
-            var message = new BrokeredMessage();
-
-            //Setting up service bus 
-            var credentials = TokenProvider.CreateSharedSecretTokenProvider(issuerName, issuerKey);
-
-            var settings = new MessagingFactorySettings {OperationTimeout = new TimeSpan(0, 0, 1), TokenProvider = credentials};
-
-            var factory =
-                MessagingFactory.Create(ServiceBusEnvironment.CreateServiceUri("sb", serviceNamespace, string.Empty),
-                                        settings);
-            
-            //Input queue client and error queue client creation
-            var inputQueueClient = factory.CreateQueueClient(inputQueue);
-            var errorQueueClient = factory.CreateQueueClient(errorQueue);
-
-            try
+            using (var fileStrem = File.Open(@".\Json\notification-message.txt", FileMode.Open))
             {
-                //Get sample json message
-                using (var textReader = new StreamReader(File.Open(@".\Json\notification-message.txt", FileMode.Open)))
-                {
-                    message.Properties.Add("message-" + Guid.NewGuid(), textReader.ReadToEnd());
-                    inputQueueClient.Send(message);
-                }
-
-
-                //Read messages
-                while ((message = inputQueueClient.Receive(new TimeSpan(0, 0, 5))) != null)
-                {
-                    Trace.WriteLine(string.Format("Message received: {0}, {1}, {2}", message.SequenceNumber,
-                                                  message.GetBody<string>(), message.MessageId));
-                    message.Complete();
-
-                    //Perform request to third-party notification service
-
-                    Trace.WriteLine("Processing message (sleeping...)");
-                    Thread.Sleep(1000);
-                }
-            }
-            catch (Exception ex)
-            {
-                //Handle failure and send message to error queue
-                var errorBrokerMessage = new BrokeredMessage();
-                errorBrokerMessage.Properties.Add(ex.GetType().ToString(), ex.Message);
-                errorQueueClient.Send(errorBrokerMessage);
-
-                //Acknowledge the message
-                if (message != null) message.Abandon();
-
-            }
-            finally
-            {
-                factory.Close();
-                inputQueueClient.Close();
-                errorQueueClient.Close();
+                  //Mock sending notification to queue. Get sample json file representing notification message
+                var message = new BrokeredMessage(fileStrem, true);
+                //message.Properties.Add("message-" + Guid.NewGuid(), textReader.ReadToEnd());
+                _inputQueueClient.Send(message);
             }
           
         }
+    }
 
+    public interface IPushMessageNotification
+    {
+        void Send(Message message);
+    }
+
+    public class DummyMessageNotification : IPushMessageNotification
+    {
+        public void Send(Message message)
+        {
+            //nothing goes here
+        }
     }
 }
