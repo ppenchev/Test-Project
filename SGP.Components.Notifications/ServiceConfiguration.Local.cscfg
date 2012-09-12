@@ -4,6 +4,11 @@
     <Instances count="1" />
     <ConfigurationSettings>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="ServiceBusNamespace" value="sgpbede" />
+      <Setting name="Issuer" value="owner" />
+      <Setting name="Key" value="pARZdOfnQMntMyvdtZcr2ZUc891wFA1JhSJAOVgdZqM=" />
+      <Setting name="InputQueueIdentifier" value="SGP.Components.Notifications.Input" />
+      <Setting name="ErrorQueueIdentifier" value="SGP.Components.Notifications.Error" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
