@@ -22,9 +22,6 @@ namespace SGP.Components.Notifications.PostApp
         //Objects for comunicating with the queues
         private static QueueClient _inputQueueClient;
 
-        //Array that holds the messages that will be generated / entered
-        private static string[] _messages;
-
         static void Main()
         {
             var exit = string.Empty;
@@ -36,8 +33,8 @@ namespace SGP.Components.Notifications.PostApp
                 
                 while (exit != "exit")
                 {
-                    ComposeMessages();
-                    Send();
+                    //Directly injecting the array of messages to 
+                    Send(ComposeMessages());
 
                     Console.WriteLine("Type \"exit\" if you want to quit, else just press \"Enter\".");
                     exit = Console.ReadLine();
@@ -76,8 +73,11 @@ namespace SGP.Components.Notifications.PostApp
             _inputQueueClient = _factory.CreateQueueClient(_inputQueue);
         }
 
-        private static void ComposeMessages()
+        private static string[] ComposeMessages()
         {
+            //Array that holds the messages that will be generated / entered
+            string[] messages;
+
             //User could use automation approach for sending messages or could create some message on his own.
             var usersChoise = string.Empty;
             while (usersChoise != "1" && usersChoise != "2")
@@ -94,7 +94,7 @@ namespace SGP.Components.Notifications.PostApp
             }
 
             //Initialize the array that will hold the messages
-            _messages = new string[messagesCount];
+            messages = new string[messagesCount];
 
             switch (usersChoise)
             {
@@ -107,12 +107,12 @@ namespace SGP.Components.Notifications.PostApp
                     
                     var fixture = new Fixture();
 
-                    _messages =
+                    messages =
                         fixture.CreateMany<Message>(messagesCount).Select(message => JsonConvert.SerializeObject(message))
                             .ToArray();
 
                     //Display messages in the console
-                    foreach (var messageJson in _messages)
+                    foreach (var messageJson in messages)
                     {
                         Console.WriteLine(messageJson + "\r\n");
                     }
@@ -122,26 +122,40 @@ namespace SGP.Components.Notifications.PostApp
                     break;
                 //manual 
                 case "2":
+                    //Message Id and Payload
                     for (var i = 0; i < messagesCount; i++)
                     {
+                        Console.WriteLine(string.Format("Enter user id for message {0}", i + 1));
+                        var messageObject = new Message
+                                                {
+                                                    UserId = Console.ReadLine(), 
+                                                    NotificationType = "browser", 
+                                                    BrowserMessageType = "subscribed-component"
+                                                };
+
                         Console.WriteLine(string.Format("Enter payload for message {0}", i + 1));
-                        _messages[i] = Console.ReadLine();
+                        messageObject.Payload = Console.ReadLine();
+                        
+                        messages[i] = JsonConvert.SerializeObject(messageObject);
+                        Console.WriteLine(string.Format("Message with user id {0} added.", i + 1));
                     }
                     break;
                 default:
                     Console.WriteLine("Oppsss! This is not supposed to happened!");
                     break;
             }
+
+            return messages;
         }
         
-        static void Send()
+        static void Send(string[] messages)
         {
-            Console.Write(string.Format("Sending {0} message(s)", _messages.Length));
+            if (messages == null)
+                throw new ArgumentNullException("Messages in collection is null.");
 
-            if (_messages == null) 
-                throw new ArgumentNullException("Messages is collection is null.");
+            Console.Write(string.Format("Sending {0} message(s)", messages.Length));
 
-            foreach (var message in _messages)
+            foreach (var message in messages)
             {
                 //Create message based on generated or typed-in ones -> Send them to the input queue
                 var queueMessage = new BrokeredMessage(message);
