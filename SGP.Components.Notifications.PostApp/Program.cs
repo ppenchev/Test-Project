@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Configuration;
-using System.IO;
 using System.Linq;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
@@ -26,21 +25,30 @@ namespace SGP.Components.Notifications.PostApp
         //Array that holds the messages that will be generated / entered
         private static string[] _messages;
 
-        static void Main(string[] args)
+        static void Main()
         {
             try
             {
                 //generate messages -> collect input -> send -> free resources
                 Setup();
-                ComposeMessages();
-                Send();
-                End();    
 
-                Console.ReadLine();
+                var exit = string.Empty;
+                while (exit != "exit")
+                {
+                    ComposeMessages();
+                    Send();
+
+                    Console.WriteLine("Type \"exit\" if you want to quit, else just press \"Enter\".");
+                    exit = Console.ReadLine();
+                }
+
+                End();        
             }
             catch (Exception ex)
             {
-                
+                Console.WriteLine("***An exception has occured***");
+                Console.WriteLine("TYPE: {0}", ex.GetType());
+                Console.WriteLine(string.Format("STACK TRACE {0}", ex.StackTrace));
             }
         }
 
@@ -49,7 +57,7 @@ namespace SGP.Components.Notifications.PostApp
             Console.WriteLine("Reading configuration...");
 
             _serviceNamespace = ConfigurationManager.AppSettings["ServiceBusNamespace"];
-            Console.WriteLine(String.Format("* Service bus namespace is \"{0}\"", _serviceNamespace));
+            Console.WriteLine(value: String.Format("* Service bus namespace is \"{0}\"", _serviceNamespace));
 
             _issuerName = ConfigurationManager.AppSettings["Issuer"];
             Console.WriteLine(String.Format("* Issuer \"{0}\"", _issuerName));
@@ -60,6 +68,7 @@ namespace SGP.Components.Notifications.PostApp
             _inputQueue = ConfigurationManager.AppSettings["InputQueueIdentifier"];
             Console.WriteLine(String.Format("* Input queue identifier \"{0}\" \r\n", _inputQueue));
 
+            //Create queue client for posting to the input queue
             var credentials = TokenProvider.CreateSharedSecretTokenProvider(_issuerName, _issuerKey);
             _factory = MessagingFactory.Create(ServiceBusEnvironment.CreateServiceUri("sb", _serviceNamespace, string.Empty), credentials);
             _inputQueueClient = _factory.CreateQueueClient(_inputQueue);
@@ -67,6 +76,7 @@ namespace SGP.Components.Notifications.PostApp
 
         private static void ComposeMessages()
         {
+            //User could use automation approach for sending messages or could create some message on his own.
             var usersChoise = string.Empty;
             while (usersChoise != "1" && usersChoise != "2")
             {
@@ -76,6 +86,7 @@ namespace SGP.Components.Notifications.PostApp
 
             switch (usersChoise)
             {
+                //automation 
                 case "1":
 
                     var messagesCount = 0;
@@ -96,6 +107,7 @@ namespace SGP.Components.Notifications.PostApp
                         fixture.CreateMany<Message>(messagesCount).Select(message => JsonConvert.SerializeObject(message))
                             .ToArray();
 
+                    //Display messages in the console
                     foreach (var messageJson in _messages)
                     {
                         Console.WriteLine(messageJson + "\r\n");
@@ -104,6 +116,7 @@ namespace SGP.Components.Notifications.PostApp
                     Console.WriteLine("=========================================================================\r\n");
 
                     break;
+                //manual 
                 case "2":
                     break;
                 default:
@@ -121,12 +134,13 @@ namespace SGP.Components.Notifications.PostApp
 
             foreach (var message in _messages)
             {
+                //Create message based on generated or typed-in ones -> Send them to the input queue
                 var queueMessage = new BrokeredMessage(message);
                 _inputQueueClient.Send(queueMessage);
                 Console.Write(".");
             }
 
-            Console.Write("\r\nMessage(s) were send successfully!");
+            Console.WriteLine("\r\nMessage(s) were send successfully!");
         }
 
         private static void End()
