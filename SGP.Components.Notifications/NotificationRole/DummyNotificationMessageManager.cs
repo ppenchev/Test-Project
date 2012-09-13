@@ -1,5 +1,4 @@
-﻿using System;
-using NotificationRole.Model;
+﻿using NotificationRole.Model;
 
 namespace NotificationRole
 {

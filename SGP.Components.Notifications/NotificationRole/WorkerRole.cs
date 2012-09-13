@@ -1,6 +1,6 @@
 using System;
+using System.Diagnostics;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
@@ -49,29 +49,33 @@ namespace NotificationRole
                     
                     inputMessage = _inputQueueClient.Receive();
                     
+                    Trace.WriteLine(string.Format("Message received: {0}, {1}", inputMessage.SequenceNumber, inputMessage.MessageId));
+
                     inputMessage.Complete();
                     
                     //Perform request to third-party notification service. Skeleton implementation
                     IPushNotificationMessageManager messageManager = new DummyNotificationMessageManager();
                     messageManager.Send(new Message
                                       {
-                                          BrowserMessageType = "top-right-panel-id",
+                                          BrowserMessageType = "subscribed-component",
                                           NotificationType = "browser",
-                                          Payload = "Additional information here.",
+                                          Payload = "{ json }",
                                           UserId = "abc-123"
                                       });
                     
                 }
                 catch (Exception ex)
                 {
-                    //Handle failure and send message, containing our input message and info for the exception, to error queue
-                    var errorMessage = inputMessage; //Will be changed
-                    if (errorMessage != null)
+                    //Handle failure and send message. Post a copy of the input message to error queue.
+                    if (inputMessage != null)
                     {
+                        var errorMessage = new BrokeredMessage(inputMessage.GetBody<Stream>(), true);
+                        //We are adding and information about the occured exeption.     
                         errorMessage.Properties.Add("Exception", ex.Message);
                         errorMessage.Properties.Add("ExceptionStackTrace", ex.StackTrace);
+
+                        _errorQueueClient.Send(errorMessage);
                     }
-                    _errorQueueClient.Send(errorMessage);
                 }
                 
                 Thread.Sleep(10000);
@@ -88,7 +92,6 @@ namespace NotificationRole
             _inputQueueClient.Close();
             _errorQueueClient.Close();
 
-            //
             _factory = null;
             _inputQueueClient = null;
             _errorQueueClient = null;
@@ -113,7 +116,7 @@ namespace NotificationRole
         {
             using (var fileStrem = File.Open(@".\Json\notification-message.txt", FileMode.Open))
             {
-                  //Mock sending notification to queue. Get sample json file representing notification message
+                //Mock sending notification to queue. Get sample json file representing notification message
                 var message = new BrokeredMessage(fileStrem, true);
                 //This line will be included when we have clearance on what descriptors should a message has.
                 //message.Properties.Add("message-" + Guid.NewGuid(), textReader.ReadToEnd());
