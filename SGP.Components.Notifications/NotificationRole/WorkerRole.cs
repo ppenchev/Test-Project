@@ -50,7 +50,6 @@ namespace NotificationRole
                 {
                     var inputMessage = _inputQueueClient.Receive();
 
-                    Trace.WriteLine(string.Format("Message received: {0}, {1}", inputMessage.SequenceNumber, inputMessage.MessageId));
                     inputMessage.Complete();
 
                     //Perform request to third-party notification service. Skeleton implementation
@@ -62,18 +61,23 @@ namespace NotificationRole
                                           Payload = "Additional information here.",
                                           UserId = "abc-123"
                                       });
+                    
                 }
                 catch (Exception ex)
                 {
+                    
                     //Handle failure and send message to error queue
                     var errorBrokerMessage = new BrokeredMessage();
-                    errorBrokerMessage.Properties.Add(ex.GetType().ToString(), ex.Message);
+                    errorBrokerMessage.Properties.Add("Exception", ex.Message);
+                    errorBrokerMessage.Properties.Add("ExceptionStackTrace", ex.StackTrace);
                     _errorQueueClient.Send(errorBrokerMessage);
                 }
                 
                 Thread.Sleep(10000);
             }
+// ReSharper disable FunctionNeverReturns
         }
+// ReSharper restore FunctionNeverReturns
 
         public override void OnStop()
         {
@@ -82,13 +86,15 @@ namespace NotificationRole
             _factory.Close();
             _inputQueueClient.Close();
             _errorQueueClient.Close();
+
+            //
+            _factory = null;
+            _inputQueueClient = null;
+            _errorQueueClient = null;
         }
 
         public override bool OnStart()
         {
-            // Set the maximum number of concurrent connections 
-            ServicePointManager.DefaultConnectionLimit = 12;
-
             //Setting up service bus 
             var credentials = TokenProvider.CreateSharedSecretTokenProvider(_issuerName, _issuerKey);
 
@@ -112,20 +118,6 @@ namespace NotificationRole
                 //message.Properties.Add("message-" + Guid.NewGuid(), textReader.ReadToEnd());
                 _inputQueueClient.Send(message);
             }
-          
-        }
-    }
-
-    public interface IPushMessageNotification
-    {
-        void Send(Message message);
-    }
-
-    public class DummyMessageNotification : IPushMessageNotification
-    {
-        public void Send(Message message)
-        {
-            //nothing goes here
         }
     }
 }
