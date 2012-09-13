@@ -40,9 +40,6 @@ namespace NotificationRole
             //Read messages
             while (true)
             {
-                //For experimental purposes we send message and right after that read it from the queue.
-                MockSend();
-
                 BrokeredMessage inputMessage = null;
                 try
                 {
@@ -110,18 +107,6 @@ namespace NotificationRole
             _errorQueueClient = _factory.CreateQueueClient(_errorQueue);            
             
             return base.OnStart();
-        }
-
-        void MockSend()
-        {
-            using (var fileStrem = File.Open(@".\Json\notification-message.txt", FileMode.Open))
-            {
-                //Mock sending notification to queue. Get sample json file representing notification message
-                var message = new BrokeredMessage(fileStrem, true);
-                //This line will be included when we have clearance on what descriptors should a message has.
-                //message.Properties.Add("message-" + Guid.NewGuid(), textReader.ReadToEnd());
-                _inputQueueClient.Send(message);
-            }
         }
     }
 }
