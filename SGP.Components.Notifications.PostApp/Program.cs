@@ -57,16 +57,16 @@ namespace SGP.Components.Notifications.PostApp
             Console.WriteLine("Reading configuration...");
 
             _serviceNamespace = ConfigurationManager.AppSettings["ServiceBusNamespace"];
-            Console.WriteLine(value: String.Format("* Service bus namespace is \"{0}\"", _serviceNamespace));
+            Console.WriteLine(string.Format("* Service bus namespace is \"{0}\"", _serviceNamespace));
 
             _issuerName = ConfigurationManager.AppSettings["Issuer"];
-            Console.WriteLine(String.Format("* Issuer \"{0}\"", _issuerName));
+            Console.WriteLine(string.Format("* Issuer \"{0}\"", _issuerName));
 
             _issuerKey = ConfigurationManager.AppSettings["Key"];
-            Console.WriteLine(String.Format("* Key \"{0}\"", _issuerKey));
+            Console.WriteLine(string.Format("* Key \"{0}\"", _issuerKey));
 
             _inputQueue = ConfigurationManager.AppSettings["InputQueueIdentifier"];
-            Console.WriteLine(String.Format("* Input queue identifier \"{0}\" \r\n", _inputQueue));
+            Console.WriteLine(string.Format("* Input queue identifier \"{0}\" \r\n", _inputQueue));
 
             //Create queue client for posting to the input queue
             var credentials = TokenProvider.CreateSharedSecretTokenProvider(_issuerName, _issuerKey);
@@ -127,7 +127,7 @@ namespace SGP.Components.Notifications.PostApp
         
         static void Send()
         {
-            Console.Write(String.Format("Sending {0} message(s)", _messages.Length));
+            Console.Write(string.Format("Sending {0} message(s)", _messages.Length));
 
             if (_messages == null) 
                 throw new ArgumentNullException("Messages is collection is null.");
