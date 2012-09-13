@@ -5,7 +5,7 @@ Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "SGP.Components.Notification
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationRole", "NotificationRole\NotificationRole.csproj", "{8C0EDD87-3312-46FC-8906-563B52783696}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGP.Components.Notifications.PostApp", "..\SGP.Components.Notifications.PostApp\SGP.Components.Notifications.PostApp.csproj", "{17CE81A2-9A91-4661-9D8C-91C8AC41D6E8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGP.Components.Notifications.PostApp", "SGP.Components.Notifications.PostApp\SGP.Components.Notifications.PostApp.csproj", "{17CE81A2-9A91-4661-9D8C-91C8AC41D6E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

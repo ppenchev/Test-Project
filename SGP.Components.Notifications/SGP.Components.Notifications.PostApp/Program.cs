@@ -27,12 +27,13 @@ namespace SGP.Components.Notifications.PostApp
 
         static void Main()
         {
+            var exit = string.Empty;
+
             try
             {
                 //generate messages -> collect input -> send -> free resources
                 Setup();
-
-                var exit = string.Empty;
+                
                 while (exit != "exit")
                 {
                     ComposeMessages();
@@ -49,6 +50,7 @@ namespace SGP.Components.Notifications.PostApp
                 Console.WriteLine("***An exception has occured***");
                 Console.WriteLine("TYPE: {0}", ex.GetType());
                 Console.WriteLine(string.Format("STACK TRACE {0}", ex.StackTrace));
+                Console.ReadLine();
             }
         }
 
@@ -84,24 +86,26 @@ namespace SGP.Components.Notifications.PostApp
                 usersChoise = Console.ReadLine();
             }
 
+            var messagesCount = 0;
+            while (messagesCount < 1 || messagesCount > 50)
+            {
+                Console.WriteLine("How many messages do you want to send to the queue? [1 - 50] ");
+                int.TryParse(Console.ReadLine(), out messagesCount);
+            }
+
+            //Initialize the array that will hold the messages
+            _messages = new string[messagesCount];
+
             switch (usersChoise)
             {
                 //automation 
                 case "1":
-
-                    var messagesCount = 0;
-                    while (messagesCount < 1 || messagesCount > 50)
-                    {
-                        Console.WriteLine("How many messages do you want to send to the queue? [1 - 50] ");
-                        int.TryParse(Console.ReadLine(), out messagesCount);
-                    }
 
                     //Generate or input message
                     Console.WriteLine("\r\nJSON Messages to be send:");
                     Console.WriteLine("=========================================================================\r\n");
                     
                     var fixture = new Fixture();
-                    _messages = new string[messagesCount];
 
                     _messages =
                         fixture.CreateMany<Message>(messagesCount).Select(message => JsonConvert.SerializeObject(message))
@@ -118,6 +122,11 @@ namespace SGP.Components.Notifications.PostApp
                     break;
                 //manual 
                 case "2":
+                    for (var i = 0; i < messagesCount; i++)
+                    {
+                        Console.WriteLine(string.Format("Enter payload for message {0}", i + 1));
+                        _messages[i] = Console.ReadLine();
+                    }
                     break;
                 default:
                     Console.WriteLine("Oppsss! This is not supposed to happened!");
