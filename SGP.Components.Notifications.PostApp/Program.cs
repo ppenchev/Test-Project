@@ -23,59 +23,24 @@ namespace SGP.Components.Notifications.PostApp
         //Objects for comunicating with the queues
         private static QueueClient _inputQueueClient;
 
-        
+        //Array that holds the messages that will be generated / entered
+        private static string[] _messages;
 
         static void Main(string[] args)
         {
-            //generate messages -> collect input -> send -> free resources
-            Setup();
-            CollectInput();
-            //Send();
-            //End();    
-
-            Console.ReadLine();
-        }
-
-        private static void End()
-        {
-            _inputQueueClient.Close();
-        }
-
-        private static void CollectInput()
-        {
-            var usersChoise = string.Empty;
-            while (usersChoise != "1" && usersChoise != "2")
+            try
             {
-                Console.WriteLine("Press \"1\" for random generated messages and \"2\" for direct typing.");
-                usersChoise = Console.ReadLine();
+                //generate messages -> collect input -> send -> free resources
+                Setup();
+                ComposeMessages();
+                Send();
+                End();    
+
+                Console.ReadLine();
             }
-
-            switch (usersChoise)
+            catch (Exception ex)
             {
-                case "1":
-
-                    var messageCount = 0;
-                    while (messageCount < 1 || messageCount > 50)
-                    {
-                        Console.WriteLine("How many messages do you want to send to the queue? [1 - 50] ");
-                        int.TryParse(Console.ReadLine(), out messageCount);
-                    }
-
-                    //Generate or input message
-                    Console.WriteLine("\r\nJSON Messages to be send:");
-                    Console.WriteLine("=========================================================================\r\n");
-                    var fixture = new Fixture();
-                    foreach (var messageJson in fixture.CreateMany<Message>(messageCount).Select(message => JsonConvert.SerializeObject(message)))
-                    {
-                        Console.WriteLine(messageJson + "\r\n");
-                    }
-
-                    break;
-                case "2":
-                    break;
-                default:
-                    Console.WriteLine("Oppsss! This is not supposed to happend!");
-                    break;
+                
             }
         }
 
@@ -83,7 +48,7 @@ namespace SGP.Components.Notifications.PostApp
         {
             Console.WriteLine("Reading configuration...");
 
-            _serviceNamespace = ConfigurationManager.AppSettings["ServiceBusNamespace"]; 
+            _serviceNamespace = ConfigurationManager.AppSettings["ServiceBusNamespace"];
             Console.WriteLine(String.Format("* Service bus namespace is \"{0}\"", _serviceNamespace));
 
             _issuerName = ConfigurationManager.AppSettings["Issuer"];
@@ -94,23 +59,79 @@ namespace SGP.Components.Notifications.PostApp
 
             _inputQueue = ConfigurationManager.AppSettings["InputQueueIdentifier"];
             Console.WriteLine(String.Format("* Input queue identifier \"{0}\" \r\n", _inputQueue));
-            
+
             var credentials = TokenProvider.CreateSharedSecretTokenProvider(_issuerName, _issuerKey);
             _factory = MessagingFactory.Create(ServiceBusEnvironment.CreateServiceUri("sb", _serviceNamespace, string.Empty), credentials);
             _inputQueueClient = _factory.CreateQueueClient(_inputQueue);
         }
 
-        static void Send()
+        private static void ComposeMessages()
         {
-            using (var fileStrem = File.Open(@".\Json\notification-message.txt", FileMode.Open))
+            var usersChoise = string.Empty;
+            while (usersChoise != "1" && usersChoise != "2")
             {
-                //Mock sending notification to queue. Get sample json file representing notification message
-                var message = new BrokeredMessage(fileStrem, true);
-                //This line will be included when we have clearance on what descriptors should a message has.
-                //message.Properties.Add("message-" + Guid.NewGuid(), textReader.ReadToEnd());
-                _inputQueueClient.Send(message);
+                Console.WriteLine("Press \"1\" for random generated messages and \"2\" for manual input.");
+                usersChoise = Console.ReadLine();
+            }
+
+            switch (usersChoise)
+            {
+                case "1":
+
+                    var messagesCount = 0;
+                    while (messagesCount < 1 || messagesCount > 50)
+                    {
+                        Console.WriteLine("How many messages do you want to send to the queue? [1 - 50] ");
+                        int.TryParse(Console.ReadLine(), out messagesCount);
+                    }
+
+                    //Generate or input message
+                    Console.WriteLine("\r\nJSON Messages to be send:");
+                    Console.WriteLine("=========================================================================\r\n");
+                    
+                    var fixture = new Fixture();
+                    _messages = new string[messagesCount];
+
+                    _messages =
+                        fixture.CreateMany<Message>(messagesCount).Select(message => JsonConvert.SerializeObject(message))
+                            .ToArray();
+
+                    foreach (var messageJson in _messages)
+                    {
+                        Console.WriteLine(messageJson + "\r\n");
+                    }
+
+                    Console.WriteLine("=========================================================================\r\n");
+
+                    break;
+                case "2":
+                    break;
+                default:
+                    Console.WriteLine("Oppsss! This is not supposed to happened!");
+                    break;
             }
         }
         
+        static void Send()
+        {
+            Console.Write(String.Format("Sending {0} message(s)", _messages.Length));
+
+            if (_messages == null) 
+                throw new ArgumentNullException("Messages is collection is null.");
+
+            foreach (var message in _messages)
+            {
+                var queueMessage = new BrokeredMessage(message);
+                _inputQueueClient.Send(queueMessage);
+                Console.Write(".");
+            }
+
+            Console.Write("\r\nMessage(s) were send successfully!");
+        }
+
+        private static void End()
+        {
+            _inputQueueClient.Close();
+        }
     }
 }
