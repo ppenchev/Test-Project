@@ -3,7 +3,7 @@
 namespace NotificationRole.Model
 {
     [JsonObject]
-    public class Message
+    public class Message : IPushNotificationMessage
     {
         [JsonProperty]
         public string UserId { get; set; }

@@ -1,7 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
@@ -38,23 +37,23 @@ namespace NotificationRole
 
         public override void Run()
         {
-            Trace.WriteLine("NotificationRole entry point called", "Information");
-            
             //Read messages
             while (true)
             {
                 //For experimental purposes we send message and right after that read it from the queue.
                 MockSend();
 
+                BrokeredMessage inputMessage = null;
                 try
                 {
-                    var inputMessage = _inputQueueClient.Receive();
-
+                    
+                    inputMessage = _inputQueueClient.Receive();
+                    
                     inputMessage.Complete();
-
+                    
                     //Perform request to third-party notification service. Skeleton implementation
-                    IPushMessageNotification notifier = new DummyMessageNotification();
-                    notifier.Send(new Message
+                    IPushNotificationMessageManager messageManager = new DummyNotificationMessageManager();
+                    messageManager.Send(new Message
                                       {
                                           BrowserMessageType = "top-right-panel-id",
                                           NotificationType = "browser",
@@ -65,12 +64,14 @@ namespace NotificationRole
                 }
                 catch (Exception ex)
                 {
-                    
-                    //Handle failure and send message to error queue
-                    var errorBrokerMessage = new BrokeredMessage();
-                    errorBrokerMessage.Properties.Add("Exception", ex.Message);
-                    errorBrokerMessage.Properties.Add("ExceptionStackTrace", ex.StackTrace);
-                    _errorQueueClient.Send(errorBrokerMessage);
+                    //Handle failure and send message, containing our input message and info for the exception, to error queue
+                    var errorMessage = inputMessage; //Will be changed
+                    if (errorMessage != null)
+                    {
+                        errorMessage.Properties.Add("Exception", ex.Message);
+                        errorMessage.Properties.Add("ExceptionStackTrace", ex.StackTrace);
+                    }
+                    _errorQueueClient.Send(errorMessage);
                 }
                 
                 Thread.Sleep(10000);

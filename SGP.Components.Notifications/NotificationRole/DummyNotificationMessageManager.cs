@@ -7,7 +7,7 @@ namespace NotificationRole
     {
         public void Send(IPushNotificationMessage message)
         {
-            throw new NotImplementedException();
+            //Skeleton 
         }
     }
 }
