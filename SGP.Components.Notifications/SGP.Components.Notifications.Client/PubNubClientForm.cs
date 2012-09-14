@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace SGP.Components.Notifications.Client
@@ -37,27 +38,42 @@ namespace SGP.Components.Notifications.Client
 
             //Fetch last 10 messages from pubnub 
             var topMessages = _pubNubService.History(_channel, 10);
-            
-            //Start background worker 
-            bckgPubNubSubscriptionWorker.RunWorkerAsync();
+            ExtractHistory(topMessages);
+
+            //Start background worker if it's not busy
+            if (!bckgPubNubSubscriptionWorker.IsBusy)
+                bckgPubNubSubscriptionWorker.RunWorkerAsync();
         }
 
-        private void btnStopSub_Click(object sender, System.EventArgs e)
+        private void BtnStopSubClick(object sender, System.EventArgs e)
         {
 
         }
 
-        private void bckgPubNubSubscriptionWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        private void BckgPubNubSubscriptionWorkerDoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             //Subscribe to the messaging api
             _pubNubService.Subscribe(_channel, SubscriptionUpdates);
         }
 
-        private bool SubscriptionUpdates(object message)
+        public bool SubscriptionUpdates(object message)
         {
-            rtbMessages.Text += message + @"\r\n";
-            rtbMessages.Update();
+            if (rtbMessages != null)
+            {
+                rtbMessages.Text += "* Message retrieved!";
+                rtbMessages.Text += message + "\r\n";
+                rtbMessages.Update();
+            }
             return true;
+        }
+
+        private void ExtractHistory(List<object> topMessages)
+        {
+            rtbMessages.Text += "Retrieving message history\n";
+            foreach (var t in topMessages)
+            {
+                rtbMessages.Text += "* Message: " + t + "\n";
+            }
         }
     }
 }

@@ -1,17 +1,17 @@
-﻿using Newtonsoft.Json;
+﻿using System.Runtime.Serialization;
 
 namespace NotificationRole.Model
 {
-    [JsonObject]
+    [DataContract(Namespace = "")]
     public class Message : IPushNotificationMessage
     {
-        [JsonProperty]
+        [DataMember(Order = 1)]
         public string UserId { get; set; }
-        [JsonProperty]
+        [DataMember(Order = 2)]
         public string NotificationType { get; set; }
-        [JsonProperty]
+        [DataMember(Order = 3)]
         public string BrowserMessageType { get; set; }
-        [JsonProperty]
+        [DataMember(Order = 4)]
         public string Payload { get; set; }
     }
 }

@@ -33,7 +33,7 @@ namespace SGP.Components.Notifications.PostApp
                 
                 while (exit != "exit")
                 {
-                    //Directly injecting the array of messages to 
+                    //Directly injecting the array of messages to send operation
                     Send(ComposeMessages());
 
                     Console.WriteLine("Type \"exit\" if you want to quit, else just press \"Enter\".");

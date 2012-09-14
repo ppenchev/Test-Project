@@ -5,6 +5,6 @@ namespace NotificationRole
 {
     public interface IPublishNotificationMessageManager
     {
-        List<object> Publish(IPushNotificationMessage message);
+        List<object> Publish(string message);
     }
 }

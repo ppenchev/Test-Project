@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PubNubClientForm));
             this.txtChannel = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.btnStopSub = new System.Windows.Forms.Button();
@@ -57,23 +58,23 @@
             // 
             // btnStopSub
             // 
-            this.btnStopSub.Location = new System.Drawing.Point(263, 54);
+            this.btnStopSub.Location = new System.Drawing.Point(156, 54);
             this.btnStopSub.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnStopSub.Name = "btnStopSub";
-            this.btnStopSub.Size = new System.Drawing.Size(226, 33);
+            this.btnStopSub.Size = new System.Drawing.Size(119, 33);
             this.btnStopSub.TabIndex = 14;
-            this.btnStopSub.Text = "STOP SUBSCRIPTION";
+            this.btnStopSub.Text = "Close";
             this.btnStopSub.UseVisualStyleBackColor = true;
-            this.btnStopSub.Click += new System.EventHandler(this.btnStopSub_Click);
+            this.btnStopSub.Click += new System.EventHandler(this.BtnStopSubClick);
             // 
             // btnSub
             // 
             this.btnSub.Location = new System.Drawing.Point(29, 54);
             this.btnSub.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnSub.Name = "btnSub";
-            this.btnSub.Size = new System.Drawing.Size(226, 33);
+            this.btnSub.Size = new System.Drawing.Size(119, 33);
             this.btnSub.TabIndex = 13;
-            this.btnSub.Text = "START SUBSCRIPTION";
+            this.btnSub.Text = "Subscribe";
             this.btnSub.UseVisualStyleBackColor = true;
             this.btnSub.Click += new System.EventHandler(this.btnSub_Click);
             // 
@@ -82,13 +83,14 @@
             this.rtbMessages.Location = new System.Drawing.Point(24, 97);
             this.rtbMessages.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.rtbMessages.Name = "rtbMessages";
+            this.rtbMessages.ReadOnly = true;
             this.rtbMessages.Size = new System.Drawing.Size(757, 486);
             this.rtbMessages.TabIndex = 12;
-            this.rtbMessages.Text = "";
+            this.rtbMessages.Text = resources.GetString("rtbMessages.Text");
             // 
             // bckgPubNubSubscriptionWorker
             // 
-            this.bckgPubNubSubscriptionWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bckgPubNubSubscriptionWorker_DoWork);
+            this.bckgPubNubSubscriptionWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BckgPubNubSubscriptionWorkerDoWork);
             // 
             // PubNubClientForm
             // 

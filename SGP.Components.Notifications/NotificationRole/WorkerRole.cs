@@ -42,38 +42,38 @@ namespace NotificationRole
             while (true)
             {
                 BrokeredMessage inputMessage = null;
+                Stream messageStream = null;
                 string messageBody;
                 try
                 {
-                    
+
                     inputMessage = _inputQueueClient.Receive();
-                    
+
                     Trace.WriteLine(string.Format("Message received: {0}, {1}", inputMessage.SequenceNumber, inputMessage.MessageId));
 
                     inputMessage.Complete();
-                    
+
                     //Retrieve meessage body 
                     Message inputMessageObject;
-                    using (var messageStream = inputMessage.GetBody<Stream>())
-                    {
-                        TextReader reader = new StreamReader(messageStream, false);
-                        messageBody = reader.ReadToEnd();
-                        inputMessageObject = JsonConvert.DeserializeObject<Message>(messageBody);
-                    }
+                    messageStream = inputMessage.GetBody<Stream>();
+                    TextReader reader = new StreamReader(messageStream, false);
+                    messageBody = reader.ReadToEnd();
+                    //messageBody = "";
+                    inputMessageObject = JsonConvert.DeserializeObject<Message>(messageBody);
+
 
                     //Perform request to third-party notification service. Skeleton implementation
                     IPublishNotificationMessageManager messageManager = new PubNubNotificationMessageManager();
-                    var info = messageManager.Publish(inputMessageObject);
+                    var info = messageManager.Publish(messageBody);
 
                     Trace.WriteLine(string.Format("* Message.UserId:{0}, Status(PubNub):{1}", inputMessageObject.UserId, info[1]));
-
                 }
                 catch (Exception ex)
                 {
                     //Handle failure and send message. Post a copy of the input message to error queue.
                     if (inputMessage != null)
                     {
-                        var errorMessage = new BrokeredMessage(inputMessage.GetBody<Stream>(), true);
+                        var errorMessage = new BrokeredMessage(messageStream, true);
                         //We are adding and information about the occured exeption.     
                         errorMessage.Properties.Add("Exception", ex.Message);
                         errorMessage.Properties.Add("ExceptionStackTrace", ex.StackTrace);
@@ -81,7 +81,11 @@ namespace NotificationRole
                         _errorQueueClient.Send(errorMessage);
                     }
                 }
-                
+                finally
+                {
+                    //messageStream.Close();
+                }
+
                 Thread.Sleep(3000);
             }
 // ReSharper disable FunctionNeverReturns

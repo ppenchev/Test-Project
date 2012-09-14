@@ -37,15 +37,15 @@ namespace NotificationRole
             _pubNubService = pubnub;
         }
 
-        public List<object> Publish(IPushNotificationMessage message)
+        public List<object> Publish(string message)
         {
             if (message == null)
                 throw new ArgumentNullException("message", "The message you want to publish to PubNub is null!");
 
             //Create json from given message
-            var jsonMessage = JsonConvert.SerializeObject(message);
+            //var jsonMessage = JsonConvert.SerializeObject(message);
 
-            return _pubNubService.Publish(_channel, jsonMessage);
+            return _pubNubService.Publish(_channel, message);
         }
     }
 }
