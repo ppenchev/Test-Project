@@ -125,7 +125,7 @@ namespace SGP.Components.Notifications.PostApp
                     //Message Id and Payload
                     for (var i = 0; i < messagesCount; i++)
                     {
-                        Console.WriteLine(string.Format("Enter user id for message {0}", i + 1));
+                        Console.WriteLine(string.Format("Enter user id for message {0}:", i + 1));
                         var messageObject = new Message
                                                 {
                                                     UserId = Console.ReadLine(), 
@@ -133,7 +133,7 @@ namespace SGP.Components.Notifications.PostApp
                                                     BrowserMessageType = "subscribed-component"
                                                 };
 
-                        Console.WriteLine(string.Format("Enter payload for message {0}", i + 1));
+                        Console.WriteLine(string.Format("Enter payload for message {0}:", i + 1));
                         messageObject.Payload = Console.ReadLine();
                         
                         messages[i] = JsonConvert.SerializeObject(messageObject);
@@ -151,7 +151,7 @@ namespace SGP.Components.Notifications.PostApp
         static void Send(string[] messages)
         {
             if (messages == null)
-                throw new ArgumentNullException("Messages in collection is null.");
+                throw new ArgumentNullException("Messages collection is null.");
 
             Console.Write(string.Format("Sending {0} message(s)", messages.Length));
 
