@@ -51,8 +51,8 @@ namespace NotificationRole
                     inputMessage.Complete();
                     
                     //Perform request to third-party notification service. Skeleton implementation
-                    IPushNotificationMessageManager messageManager = new DummyNotificationMessageManager();
-                    messageManager.Send(new Message
+                    IPublishNotificationMessageManager messageManager = new PubNubNotificationMessageManager();
+                    messageManager.Publish(new Message
                                       {
                                           BrowserMessageType = "subscribed-component",
                                           NotificationType = "browser",

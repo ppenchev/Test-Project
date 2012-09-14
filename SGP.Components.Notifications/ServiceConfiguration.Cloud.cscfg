@@ -9,6 +9,10 @@
       <Setting name="Key" value="pARZdOfnQMntMyvdtZcr2ZUc891wFA1JhSJAOVgdZqM=" />
       <Setting name="InputQueueIdentifier" value="SGP.Components.Notifications.Input" />
       <Setting name="ErrorQueueIdentifier" value="SGP.Components.Notifications.Error" />
+      <Setting name="PubNubPublishKey" value="pub-59ca5a3c-13ed-45a8-8fef-24a658a6eee5" />
+      <Setting name="PubNubSubscribeKey" value="sub-5d46b4c2-fe35-11e1-9e01-3378f031f0fb" />
+      <Setting name="PubNubSecretKey" value="sec-YjM3ZWFkZWItZTBkMS00OTViLWI3NjUtNDY5OTM5MDYzYmRl" />
+      <Setting name="PubNubMessageChannel" value="msg-channel-01" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

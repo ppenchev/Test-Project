@@ -151,7 +151,7 @@ namespace SGP.Components.Notifications.PostApp
         static void Send(string[] messages)
         {
             if (messages == null)
-                throw new ArgumentNullException("Messages collection is null.");
+                throw new ArgumentNullException("messages", "Messages collection is null.");
 
             Console.Write(string.Format("Sending {0} message(s)", messages.Length));
 

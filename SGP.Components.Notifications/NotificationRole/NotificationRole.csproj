@@ -61,9 +61,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DummyNotificationMessageManager.cs" />
+    <Compile Include="Pubnub.cs" />
+    <Compile Include="PubNubNotificationMessageManager.cs" />
     <Compile Include="Model\IPushNotificationMessage.cs" />
-    <Compile Include="IPushNotificationMessageManager.cs" />
+    <Compile Include="IPublishNotificationMessageManager.cs" />
     <Compile Include="Model\Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorkerRole.cs" />

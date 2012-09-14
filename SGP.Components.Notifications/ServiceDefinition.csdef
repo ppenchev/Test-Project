@@ -10,6 +10,10 @@
       <Setting name="Key" />
       <Setting name="InputQueueIdentifier" />
       <Setting name="ErrorQueueIdentifier" />
+      <Setting name="PubNubPublishKey" />
+      <Setting name="PubNubSubscribeKey" />
+      <Setting name="PubNubSecretKey" />
+      <Setting name="PubNubMessageChannel" />
     </ConfigurationSettings>
   </WorkerRole>
 </ServiceDefinition>
