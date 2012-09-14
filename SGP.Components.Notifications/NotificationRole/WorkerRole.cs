@@ -6,6 +6,7 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure;
+using Newtonsoft.Json;
 using NotificationRole.Model;
 
 namespace NotificationRole
@@ -41,6 +42,7 @@ namespace NotificationRole
             while (true)
             {
                 BrokeredMessage inputMessage = null;
+                string messageBody;
                 try
                 {
                     
@@ -50,16 +52,21 @@ namespace NotificationRole
 
                     inputMessage.Complete();
                     
+                    //Retrieve meessage body 
+                    Message inputMessageObject;
+                    using (var messageStream = inputMessage.GetBody<Stream>())
+                    {
+                        TextReader reader = new StreamReader(messageStream, false);
+                        messageBody = reader.ReadToEnd();
+                        inputMessageObject = JsonConvert.DeserializeObject<Message>(messageBody);
+                    }
+
                     //Perform request to third-party notification service. Skeleton implementation
                     IPublishNotificationMessageManager messageManager = new PubNubNotificationMessageManager();
-                    messageManager.Publish(new Message
-                                      {
-                                          BrowserMessageType = "subscribed-component",
-                                          NotificationType = "browser",
-                                          Payload = "{ json }",
-                                          UserId = "abc-123"
-                                      });
-                    
+                    var info = messageManager.Publish(inputMessageObject);
+
+                    Trace.WriteLine(string.Format("* Message.UserId:{0}, Status(PubNub):{1}", inputMessageObject.UserId, info[1]));
+
                 }
                 catch (Exception ex)
                 {

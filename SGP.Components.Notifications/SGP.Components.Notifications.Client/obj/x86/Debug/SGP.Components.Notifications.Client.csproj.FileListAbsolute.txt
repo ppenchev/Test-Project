@@ -1,0 +1,8 @@
+H:\Projects\git-remote\Test-Project\SGP.Components.Notifications\SGP.Components.Notifications.Client\obj\x86\Debug\SGP.Components.Notifications.Client.PubNubClientForm.resources
+H:\Projects\git-remote\Test-Project\SGP.Components.Notifications\SGP.Components.Notifications.Client\obj\x86\Debug\SGP.Components.Notifications.Client.Properties.Resources.resources
+H:\Projects\git-remote\Test-Project\SGP.Components.Notifications\SGP.Components.Notifications.Client\obj\x86\Debug\SGP.Components.Notifications.Client.csproj.GenerateResource.Cache
+H:\Projects\git-remote\Test-Project\SGP.Components.Notifications\SGP.Components.Notifications.Client\bin\Debug\SGP.Components.Notifications.Client.exe.config
+H:\Projects\git-remote\Test-Project\SGP.Components.Notifications\SGP.Components.Notifications.Client\bin\Debug\SGP.Components.Notifications.Client.exe
+H:\Projects\git-remote\Test-Project\SGP.Components.Notifications\SGP.Components.Notifications.Client\bin\Debug\SGP.Components.Notifications.Client.pdb
+H:\Projects\git-remote\Test-Project\SGP.Components.Notifications\SGP.Components.Notifications.Client\obj\x86\Debug\SGP.Components.Notifications.Client.exe
+H:\Projects\git-remote\Test-Project\SGP.Components.Notifications\SGP.Components.Notifications.Client\obj\x86\Debug\SGP.Components.Notifications.Client.pdb

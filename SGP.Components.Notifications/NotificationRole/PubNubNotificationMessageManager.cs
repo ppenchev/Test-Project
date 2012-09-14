@@ -10,7 +10,7 @@ namespace NotificationRole
     public class PubNubNotificationMessageManager : IPublishNotificationMessageManager
     {
         //API key for secure publishing and subscibing to PubNub messaging service
-        private string _privateKey;
+        private string _publishKey;
         private string _subscribeKey;
         private string _secretKey;
 
@@ -23,15 +23,21 @@ namespace NotificationRole
         public PubNubNotificationMessageManager()
         {
             //Retrieve configuration values
-            _privateKey = CloudConfigurationManager.GetSetting("PubNubPublishKey");
+            _publishKey = CloudConfigurationManager.GetSetting("PubNubPublishKey");
             _subscribeKey = CloudConfigurationManager.GetSetting("PubNubSubscribeKey");
             _secretKey = CloudConfigurationManager.GetSetting("PubNubSecretKey");
             _channel = CloudConfigurationManager.GetSetting("PubNubMessageChannel");
-
-            _pubNubService = new Pubnub(_privateKey, _subscribeKey, _secretKey, false);
+            
+            _pubNubService = new Pubnub(_publishKey, _subscribeKey, _secretKey, false);
         }
 
-        public void Publish(IPushNotificationMessage message)
+        //
+        public PubNubNotificationMessageManager(Pubnub pubnub)
+        {
+            _pubNubService = pubnub;
+        }
+
+        public List<object> Publish(IPushNotificationMessage message)
         {
             if (message == null)
                 throw new ArgumentNullException("message", "The message you want to publish to PubNub is null!");
@@ -39,9 +45,7 @@ namespace NotificationRole
             //Create json from given message
             var jsonMessage = JsonConvert.SerializeObject(message);
 
-            List<object> info = _pubNubService.Publish(_channel, jsonMessage);
-
-            Trace.WriteLine(string.Format("* Message:{0}, Status:{1}", jsonMessage, info[1]));
+            return _pubNubService.Publish(_channel, jsonMessage);
         }
     }
 }
