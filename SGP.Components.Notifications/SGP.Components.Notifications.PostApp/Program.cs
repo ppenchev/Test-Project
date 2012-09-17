@@ -125,7 +125,8 @@ namespace SGP.Components.Notifications.PostApp
                     //Message Id and Payload
                     for (var i = 0; i < messagesCount; i++)
                     {
-                        Console.WriteLine(string.Format("Enter user id for message {0}:", i + 1));
+                        //That way we can send messages to certain clients. Used user ids : ms
+                        Console.WriteLine(string.Format("Enter user id for message {0}. Currently we are supporting following ids: userChannel-1, userChannel-2, userChannel-3, userChannel-4, userChannel-5, userChannel-6, userChannel-7, userChannel-8, userChannel-9, userChannel-10:", i + 1));
                         var messageObject = new Message
                                                 {
                                                     UserId = Console.ReadLine(), 
@@ -158,7 +159,8 @@ namespace SGP.Components.Notifications.PostApp
             foreach (var queueMessage in messages.Select(message => new BrokeredMessage(message)))
             {
                 _inputQueueClient.Send(queueMessage);
-                Console.Write(".");
+                Console.WriteLine(".");
+                //Console.Write(string.Format("\r\n> A message was send to channel {0}", queueMessage.Us));
             }
 
             Console.WriteLine("\r\nMessage(s) were send successfully!");

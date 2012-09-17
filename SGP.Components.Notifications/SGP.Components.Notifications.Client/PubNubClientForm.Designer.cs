@@ -29,22 +29,13 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PubNubClientForm));
-            this.txtChannel = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.btnStopSub = new System.Windows.Forms.Button();
             this.btnSub = new System.Windows.Forms.Button();
             this.rtbMessages = new System.Windows.Forms.RichTextBox();
             this.bckgPubNubSubscriptionWorker = new System.ComponentModel.BackgroundWorker();
+            this.cmbUserIds = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
-            // 
-            // txtChannel
-            // 
-            this.txtChannel.Location = new System.Drawing.Point(173, 17);
-            this.txtChannel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.txtChannel.Name = "txtChannel";
-            this.txtChannel.Size = new System.Drawing.Size(608, 27);
-            this.txtChannel.TabIndex = 11;
-            this.txtChannel.Text = "msg-channel-01";
             // 
             // label2
             // 
@@ -53,7 +44,7 @@
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(123, 19);
-            this.label2.TabIndex = 10;
+            this.label2.TabIndex = 0;
             this.label2.Text = "Channel Name: ";
             // 
             // btnStopSub
@@ -62,7 +53,7 @@
             this.btnStopSub.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnStopSub.Name = "btnStopSub";
             this.btnStopSub.Size = new System.Drawing.Size(119, 33);
-            this.btnStopSub.TabIndex = 14;
+            this.btnStopSub.TabIndex = 3;
             this.btnStopSub.Text = "Close";
             this.btnStopSub.UseVisualStyleBackColor = true;
             this.btnStopSub.Click += new System.EventHandler(this.BtnStopSubClick);
@@ -73,7 +64,7 @@
             this.btnSub.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnSub.Name = "btnSub";
             this.btnSub.Size = new System.Drawing.Size(119, 33);
-            this.btnSub.TabIndex = 13;
+            this.btnSub.TabIndex = 2;
             this.btnSub.Text = "Subscribe";
             this.btnSub.UseVisualStyleBackColor = true;
             this.btnSub.Click += new System.EventHandler(this.BtnSubClick);
@@ -85,22 +76,42 @@
             this.rtbMessages.Name = "rtbMessages";
             this.rtbMessages.ReadOnly = true;
             this.rtbMessages.Size = new System.Drawing.Size(757, 486);
-            this.rtbMessages.TabIndex = 12;
+            this.rtbMessages.TabIndex = 4;
             this.rtbMessages.Text = resources.GetString("rtbMessages.Text");
             // 
             // bckgPubNubSubscriptionWorker
             // 
             this.bckgPubNubSubscriptionWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BckgPubNubSubscriptionWorkerDoWork);
             // 
+            // cmbUserIds
+            // 
+            this.cmbUserIds.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbUserIds.FormattingEnabled = true;
+            this.cmbUserIds.Items.AddRange(new object[] {
+            "userChannel-1",
+            "userChannel-2",
+            "userChannel-3",
+            "userChannel-4",
+            "userChannel-5",
+            "userChannel-6",
+            "userChannel-7",
+            "userChannel-8",
+            "userChannel-9",
+            "userChannel-10"});
+            this.cmbUserIds.Location = new System.Drawing.Point(144, 17);
+            this.cmbUserIds.Name = "cmbUserIds";
+            this.cmbUserIds.Size = new System.Drawing.Size(637, 27);
+            this.cmbUserIds.TabIndex = 1;
+            // 
             // PubNubClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(801, 602);
+            this.Controls.Add(this.cmbUserIds);
             this.Controls.Add(this.btnStopSub);
             this.Controls.Add(this.btnSub);
             this.Controls.Add(this.rtbMessages);
-            this.Controls.Add(this.txtChannel);
             this.Controls.Add(this.label2);
             this.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -115,12 +126,12 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox txtChannel;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnStopSub;
         private System.Windows.Forms.Button btnSub;
         private System.Windows.Forms.RichTextBox rtbMessages;
         private System.ComponentModel.BackgroundWorker bckgPubNubSubscriptionWorker;
+        private System.Windows.Forms.ComboBox cmbUserIds;
     }
 }
 

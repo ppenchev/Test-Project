@@ -27,11 +27,14 @@ namespace SGP.Components.Notifications.Client
             _secretKey = ConfigurationManager.AppSettings["PubNubSecretKey"];
 
             _pubNubService = new Pubnub(_publishKey, _subscribeKey, _secretKey);
+
+            cmbUserIds.SelectedIndex = 0;
         }
 
         private void BtnSubClick(object sender, System.EventArgs e)
         {
-            _channel = txtChannel.Text;
+            //Should be user id
+            _channel = cmbUserIds.Text;
 
             if (string.IsNullOrEmpty(_channel))
                 MessageBox.Show("Empty channel name field!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

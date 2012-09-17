@@ -1,7 +1,9 @@
-﻿namespace NotificationRole
+﻿using NotificationRole.Model;
+
+namespace NotificationRole
 {
     public interface IPublishNotificationMessageManager
     {
-        bool Publish(string message);
+        bool Publish(Message message);
     }
 }

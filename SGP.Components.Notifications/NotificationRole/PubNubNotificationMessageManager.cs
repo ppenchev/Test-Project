@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.WindowsAzure;
+using NotificationRole.Model;
 using PubNub_Messaging;
 
 namespace NotificationRole
@@ -36,7 +37,7 @@ namespace NotificationRole
             _pubNubService = pubnub;
         }
 
-        public bool Publish(string message)
+        public bool Publish(Message message)
         {
             if (message == null)
                 throw new ArgumentNullException("message", "The message you want to publish to PubNub is null!");
@@ -53,6 +54,10 @@ namespace NotificationRole
                         );
                 }
             };
+
+            //Every user should have own channel. The name of the channel is the user id.
+            _channel = message.UserId;
+
             return _pubNubService.publish(_channel, message);
         }
     }

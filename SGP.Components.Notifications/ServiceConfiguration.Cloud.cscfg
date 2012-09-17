@@ -12,7 +12,7 @@
       <Setting name="PubNubPublishKey" value="pub-888ff646-d718-4dd7-8735-ff668649e6a8" />
       <Setting name="PubNubSubscribeKey" value="sub-33a18b26-fcd3-11e1-b03e-fdc761f25784" />
       <Setting name="PubNubSecretKey" value="sec-NmZhY2U1ODEtODk0Zi00NjY3LTk4ODMtNmY3MWI1MjhmY2Y2" />
-      <Setting name="PubNubMessageChannel" value="msg-channel-01" />
+      <Setting name="PubNubMessageChannel" value="userChannel-1" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
