@@ -155,10 +155,8 @@ namespace SGP.Components.Notifications.PostApp
 
             Console.Write(string.Format("Sending {0} message(s)", messages.Length));
 
-            foreach (var message in messages)
+            foreach (var queueMessage in messages.Select(message => new BrokeredMessage(message)))
             {
-                //Create message based on generated or typed-in ones -> Send them to the input queue
-                var queueMessage = new BrokeredMessage(message);
                 _inputQueueClient.Send(queueMessage);
                 Console.Write(".");
             }

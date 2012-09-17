@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using NotificationRole.Model;
-
-namespace NotificationRole
+﻿namespace NotificationRole
 {
     public interface IPublishNotificationMessageManager
     {
-        List<object> Publish(string message);
+        bool Publish(string message);
     }
 }

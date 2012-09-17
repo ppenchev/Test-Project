@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.ComponentModel;
 using System.Configuration;
-using System.Drawing;
 using System.Windows.Forms;
+using PubNub_Messaging;
 
 namespace SGP.Components.Notifications.Client
 {
@@ -29,17 +29,32 @@ namespace SGP.Components.Notifications.Client
             _pubNubService = new Pubnub(_publishKey, _subscribeKey, _secretKey);
         }
 
-        private void btnSub_Click(object sender, System.EventArgs e)
+        private void BtnSubClick(object sender, System.EventArgs e)
         {
             _channel = txtChannel.Text;
 
             if (string.IsNullOrEmpty(_channel))
                 MessageBox.Show("Empty channel name field!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-            //Fetch last 10 messages from pubnub 
-            var topMessages = _pubNubService.History(_channel, 10);
-            ExtractHistory(topMessages);
 
+            _pubNubService.PropertyChanged += delegate(object pubNubSender, PropertyChangedEventArgs eventArgs)
+            {
+                if (eventArgs.PropertyName == "History")
+                {
+                    rtbMessages.Invoke((MethodInvoker)delegate
+                                                          {
+                                               rtbMessages.Text += "Retrieving message history\n";
+                                               foreach (var t in ((Pubnub)pubNubSender).History)
+                                               {
+                                                   rtbMessages.Text += "* Message: " + t + "\n";
+                                               }  
+                                           });
+                }
+            };
+
+            //Fetch last 10 messages from pubnub 
+            _pubNubService.history(_channel, 10);
+            
             //Start background worker if it's not busy
             if (!bckgPubNubSubscriptionWorker.IsBusy)
                 bckgPubNubSubscriptionWorker.RunWorkerAsync();
@@ -50,10 +65,22 @@ namespace SGP.Components.Notifications.Client
 
         }
 
-        private void BckgPubNubSubscriptionWorkerDoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        private void BckgPubNubSubscriptionWorkerDoWork(object sender, DoWorkEventArgs e)
         {
+            _pubNubService.PropertyChanged += delegate(object pubNubeSender, PropertyChangedEventArgs eventArgs)
+            {
+                if (eventArgs.PropertyName == "ReturnMessage")
+                {
+                    rtbMessages.Invoke((MethodInvoker)delegate
+                                                          {
+                        rtbMessages.Text += "* Message retrieved: ";
+                        rtbMessages.Text += (((Pubnub)pubNubeSender).ReturnMessage);
+                        rtbMessages.Update();
+                    });
+                }
+            };
             //Subscribe to the messaging api
-            _pubNubService.Subscribe(_channel, SubscriptionUpdates);
+            _pubNubService.subscribe(_channel);
         }
 
         public bool SubscriptionUpdates(object message)
@@ -65,15 +92,6 @@ namespace SGP.Components.Notifications.Client
                 rtbMessages.Update();
             }
             return true;
-        }
-
-        private void ExtractHistory(List<object> topMessages)
-        {
-            rtbMessages.Text += "Retrieving message history\n";
-            foreach (var t in topMessages)
-            {
-                rtbMessages.Text += "* Message: " + t + "\n";
-            }
         }
     }
 }

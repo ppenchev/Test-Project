@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.WindowsAzure;
-using Newtonsoft.Json;
-using NotificationRole.Model;
+using PubNub_Messaging;
 
 namespace NotificationRole
 {
@@ -28,7 +27,7 @@ namespace NotificationRole
             _secretKey = CloudConfigurationManager.GetSetting("PubNubSecretKey");
             _channel = CloudConfigurationManager.GetSetting("PubNubMessageChannel");
             
-            _pubNubService = new Pubnub(_publishKey, _subscribeKey, _secretKey, false);
+            _pubNubService = new Pubnub(_publishKey, _subscribeKey, _secretKey);
         }
 
         //
@@ -37,15 +36,24 @@ namespace NotificationRole
             _pubNubService = pubnub;
         }
 
-        public List<object> Publish(string message)
+        public bool Publish(string message)
         {
             if (message == null)
                 throw new ArgumentNullException("message", "The message you want to publish to PubNub is null!");
 
             //Create json from given message
             //var jsonMessage = JsonConvert.SerializeObject(message);
-
-            return _pubNubService.Publish(_channel, message);
+            _pubNubService.PropertyChanged += delegate(object sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == "Publish")
+                {
+                    Trace.WriteLine(
+                        "Publish Success: " + ((Pubnub)sender).Publish[0] +
+                        "\nPublish Info: " + ((Pubnub)sender).Publish[1]
+                        );
+                }
+            };
+            return _pubNubService.publish(_channel, message);
         }
     }
 }

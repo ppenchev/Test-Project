@@ -76,7 +76,7 @@
             this.btnSub.TabIndex = 13;
             this.btnSub.Text = "Subscribe";
             this.btnSub.UseVisualStyleBackColor = true;
-            this.btnSub.Click += new System.EventHandler(this.btnSub_Click);
+            this.btnSub.Click += new System.EventHandler(this.BtnSubClick);
             // 
             // rtbMessages
             // 
