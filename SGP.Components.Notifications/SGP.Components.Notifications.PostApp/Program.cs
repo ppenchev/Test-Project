@@ -108,7 +108,7 @@ namespace SGP.Components.Notifications.PostApp
                     var fixture = new Fixture();
 
                     messages =
-                        fixture.CreateMany<Message>(messagesCount).Select(message => JsonConvert.SerializeObject(message))
+                        fixture.CreateMany<Message>(messagesCount).Select(message => JsonConvert.SerializeObject(message, Formatting.Indented))
                             .ToArray();
 
                     //Display messages in the console
